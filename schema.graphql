@@ -1,0 +1,24 @@
+enum USER_ROLE {
+    ADMIN
+    AUTHOR
+}
+
+type User { # User table in RDBMS
+    id: ID!
+    role: USER_ROLE!
+    name: String!
+    email: String! @id
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    todos: [Todo!] @hasInverse(field: user)
+}
+
+type Todo { # Todo table in RDBMS
+    id: ID! 
+    title: String!
+    description: String
+    hasCompleted: Boolean!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    user: User! @hasInverse(field: todos)
+}

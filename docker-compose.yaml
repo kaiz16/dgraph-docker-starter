@@ -1,0 +1,35 @@
+version: "3.2"
+services:
+  zero:
+    container_name: "dgraph-zero"
+    image: dgraph/dgraph:v21.03-slash
+    volumes:
+      - db_data:/dgraph
+    network_mode: host
+    ports:
+      - 5080 # grpc port
+      - 6080 # http port
+    restart: on-failure
+    command: dgraph zero --my=127.0.0.1:5080
+  alpha:
+    container_name: "dgraph-alpha"
+    image: dgraph/dgraph:v21.03-slash
+    volumes:
+      - db_data:/dgraph
+    network_mode: host
+    ports:
+      - 8080 # http port
+      - 7080 # grpc port
+      - 9080 # grpc port
+    restart: on-failure
+    command: dgraph alpha --my=127.0.0.1:7080 --zero=127.0.0.1:5080 --security "whitelist=0.0.0.0/0; token=TOP_SECRET" --graphql "debug=true; extensions=true; introspection=true; poll-interval=1s;"
+  graphql-playground:
+    container_name: "dgraphql-playground"
+    image: vtemian/graphql-playground
+    ports:
+      - "8888:80"
+    environment:
+      - GRAPHQL_ENDPOINT=http://127.0.0.1:8080/graphql
+
+volumes:
+  db_data:
